@@ -27,7 +27,7 @@ Features
   - Marker bubbles
   - Data listing
   - Single item page
- - Custom date format using [Moment.js options](http://momentjs.com/docs/#/displaying/format/) including [`fromNow()`](http://momentjs.com/docs/#/displaying/fromnow/) feature
+ - **Custom date format** using [Moment.js options](http://momentjs.com/docs/#/displaying/format/) including [`fromNow()`](http://momentjs.com/docs/#/displaying/fromnow/) feature
 
 Usage
 -----
