@@ -1,3 +1,5 @@
+var carttirail = {};
+
 (function($) {
 
 	var app = carttirail;
@@ -22,7 +24,6 @@
 			}
 		}
 	};
-	var config = app.settings;
 
 	var parseConfig = function(config) {
 		if(config.map) {
@@ -34,10 +35,11 @@
 		return config;
 	};
 
-	app.init = function(containerID) {
+	var config;
+	app.init = function(containerID, userConf) {
 		app.containerID = containerID;
 		_init(containerID);
-		config = _.extend(config, parseConfig(app.config));
+		config = _.extend(app.settings, parseConfig(userConf));
 	};
 
 	app._data = {};
