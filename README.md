@@ -16,4 +16,4 @@ Requirements
 Usage
 -----
 
-Edit config.js accordingly. Better docs to come.
+View examples. Docs are on the way.
