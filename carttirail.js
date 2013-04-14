@@ -144,9 +144,7 @@ var carttirail = {};
 			filteredData.push(unique[key]);
 		}
 
-		if(config.map)
-			_markers(filteredData);
-
+		_markers(filteredData);
 		_itemListUpdate(filteredData);
 	}
 
@@ -421,7 +419,7 @@ var carttirail = {};
 		app.$.find('.clear-search').click(function() {
 			filtering = {};
 			_.each(config.filters, function(filter, i) {
-				var $field = app.$.find('.filter #' + filter.name);
+				var $field = app.$.filters.find('#' + filter.name);
 				$field.val('');
 				if(filter.type == 'multiple-select')
 					$field.val([]);
