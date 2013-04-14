@@ -22,7 +22,8 @@ var carttirail = {};
 				item: 'Loading item...',
 				error: 'Oops, something\'s wrong with the data server. Try again.'
 			}
-		}
+		},
+		templates: {}
 	};
 
 	var parseConfig = function(config) {
@@ -54,7 +55,10 @@ var carttirail = {};
 
 		app.$.page.removeClass('toggled').show();
 
-		var item = _.find(app.data, function(item) { return item.id == id; });
+		var idKey = config.dataRef.id;
+		if(!idKey)
+			idKey = 'id';
+		var item = _.find(app.data, function(item) { return item[idKey] == id; });
 		if(item) {
 			var lat = item[config.dataRef.lat];
 			var lng = item[config.dataRef.lng];
@@ -189,7 +193,7 @@ var carttirail = {};
 			dataType: 'jsonp',
 			timeout: 8000, // 8 second timeout
 			success: function(data) {
-				if(!data || !data.length) {
+				if(!data) {
 					$('#loading').text(config.labels.loading.error);
 				} else {
 					$('body').removeClass('loading');
@@ -197,6 +201,16 @@ var carttirail = {};
 					app.$.append(app.$.content);
 					if(app.map)
 						app.map.invalidateSize(true); //reset map size
+
+					// get specific node from json if specified
+					if(config.get) {
+						data = data[config.get];
+					}
+					// create ids if undefined
+					if(!config.dataRef.id) {
+						_.each(data, function(item, i) { data[i].id = i; });
+					}
+
 					app.data = data; // store data
 					_markers(data);
 					_filters();
@@ -262,8 +276,6 @@ var carttirail = {};
 			if(lat && lng) {
 				var LatLng = new L.LatLng(parseFloat(lat), parseFloat(lng));
 				var options = {};
-				// mouseover template
-				var template = _.template(config.templates.marker);
 				// marker icon
 				if(app._data.icons && app._data.icons.length) {
 					var icons = app._data.icons;
@@ -272,15 +284,26 @@ var carttirail = {};
 					}
 				}
 				// create
-				var marker = L.marker(LatLng, options).bindPopup(template({item: item}));
-				marker.on('mouseover', function(e) {
-					e.target.openPopup();
-				});
-				marker.on('mouseout', function(e) {
-					e.target.closePopup();
-				});
+				var marker = L.marker(LatLng, options);
+				if(!config.templates.marker)
+					config.templates.marker = config.templates.list;
+				if(config.templates.marker) {
+					// mouseover template
+					var template = _.template(config.templates.marker);
+					marker
+						.bindPopup(template({item: item}))
+						.on('mouseover', function(e) {
+							e.target.openPopup();
+						})
+						.on('mouseout', function(e) {
+							e.target.closePopup();
+						});
+				}
 				marker.on('click', function(e) {
-					app.openItem(item[config.dataRef.id]);
+					var idKey = config.dataRef.id;
+					if(!idKey)
+						idKey = 'id';
+					app.openItem(item[idKey]);
 					return false;
 				});
 				map.markersGroup.addLayer(marker);
