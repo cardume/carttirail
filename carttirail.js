@@ -182,11 +182,11 @@ var carttirail = {};
 		app.$.loading = $('<div id="loading">' + config.labels.loading.first + '</div>');
 		app.$.append(app.$.loading);
 
-		_data();
+		_.once(_getData);
 
 	}
 
-	var _data = function() {
+	var _getData = function() {
 
 		if(typeof config.data !== 'undefined') {
 
