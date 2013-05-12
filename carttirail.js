@@ -234,11 +234,9 @@ var carttirail = {};
 				}
 
 				app.data = data; // store data
-
-				_map();
-				_markers(data);
 				_filters();
 				_itemList(data);
+				_map(data);
 				appDimensions();
 				app.$.loading.hide();
 				_readFragments();
@@ -247,7 +245,7 @@ var carttirail = {};
 
 	}
 
-	var _map = function() {
+	var _map = function(data) {
 		if(!config.map)
 			return false;
 
@@ -276,6 +274,8 @@ var carttirail = {};
 				app._data.icons.push(new LeafIcon(icon));
 			});
 		}
+
+		_markers(data);
 	}
 
 	var _markers = function(items) {
