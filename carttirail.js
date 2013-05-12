@@ -9,8 +9,8 @@ var carttirail = {};
 		map: {
 			tiles: 'http://tile.stamen.com/toner/{z}/{x}/{y}.png',
 			center: [0, 0],
-			zoom: 3,
-			maxZoom: 10
+			zoom: 2,
+			maxZoom: 16
 		},
 		labels: { 
 			filters: 'Filters',
