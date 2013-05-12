@@ -193,9 +193,7 @@ var carttirail = {};
 			display(config.data);
 			return false;
 
-		}
-
-		if(typeof config.dataSource !== 'undefined') {
+		} else if(typeof config.dataSource !== 'undefined') {
 
 			$('body').addClass('loading');
 
@@ -218,8 +216,11 @@ var carttirail = {};
 
 		function display(data) {
 			if(!data) {
+
 				$('#loading').text(config.labels.loading.error);
+
 			} else {
+
 				$('body').removeClass('loading');
 				app.$.content = $('<div id="carttirail-content"><div class="inner"></div></div>');
 				app.$.append(app.$.content);
@@ -234,12 +235,17 @@ var carttirail = {};
 				}
 
 				app.data = data; // store data
+
 				_filters();
 				_itemList(data);
+
 				_map(data);
-				appDimensions();
+
 				app.$.loading.hide();
+
 				_readFragments();
+				appDimensions();
+
 			}
 		}
 
