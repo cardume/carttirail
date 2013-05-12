@@ -182,8 +182,8 @@ var carttirail = {};
 		app.$.loading = $('<div id="loading">' + config.labels.loading.first + '</div>');
 		app.$.append(app.$.loading);
 
-		_data();
 		_map();
+		_data();
 
 	}
 
