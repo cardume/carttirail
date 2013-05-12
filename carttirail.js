@@ -235,10 +235,11 @@ var carttirail = {};
 
 				app.data = data; // store data
 
+				_map(data);
+
 				_filters();
 				_itemList(data);
 
-				_map(data);
 
 				app.$.loading.hide();
 
