@@ -188,14 +188,14 @@ var carttirail = {};
 
 	var _data = function() {
 
-		if(config.data) {
+		if(typeof config.data !== 'undefined') {
 
 			display(config.data);
 			return false;
 
 		}
 
-		if(config.dataSource) {
+		if(typeof config.dataSource !== 'undefined') {
 
 			$('body').addClass('loading');
 
