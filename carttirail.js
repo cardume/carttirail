@@ -214,6 +214,7 @@ var carttirail = {};
 		}
 
 		function display(data) {
+			console.log('hi');
 			if(!data) {
 
 				$('#loading').text(config.labels.loading.error);
