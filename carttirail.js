@@ -186,9 +186,9 @@ var carttirail = {};
 
 		if(config.data) {
 
-			display(data);
+			display(config.data);
 			return false;
-			
+
 		}
 
 		if(config.dataSource) {
