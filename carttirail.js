@@ -101,7 +101,7 @@ var carttirail = {};
 			}
 		}
 
-		var display = function(item) {
+		function display(item) {
 			if(!config.templates.single)
 				config.templates.single = config.templates.list;
 			var template = _.template(config.templates.single);
@@ -191,7 +191,6 @@ var carttirail = {};
 		if(typeof config.data !== 'undefined') {
 
 			display(config.data);
-			return false;
 
 		} else if(typeof config.dataSource !== 'undefined') {
 
