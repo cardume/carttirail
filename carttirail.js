@@ -182,7 +182,7 @@ var carttirail = {};
 		app.$.loading = $('<div id="loading">' + config.labels.loading.first + '</div>');
 		app.$.append(app.$.loading);
 
-		_.once(_getData);
+		_getData();
 
 	}
 
@@ -214,7 +214,6 @@ var carttirail = {};
 		}
 
 		function display(data) {
-			console.log('hi');
 			if(!data) {
 
 				$('#loading').text(config.labels.loading.error);
