@@ -182,7 +182,6 @@ var carttirail = {};
 		app.$.loading = $('<div id="loading">' + config.labels.loading.first + '</div>');
 		app.$.append(app.$.loading);
 
-		_map();
 		_data();
 
 	}
@@ -237,6 +236,8 @@ var carttirail = {};
 				}
 
 				app.data = data; // store data
+
+				_map();
 				_markers(data);
 				_filters();
 				_itemList(data);
