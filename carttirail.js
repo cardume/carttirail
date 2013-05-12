@@ -39,8 +39,8 @@ var carttirail = {};
 	var config;
 	app.init = function(containerID, userConf) {
 		app.containerID = containerID;
-		_init(containerID);
 		config = _.extend(app.settings, parseConfig(userConf));
+		_init(containerID);
 	};
 
 	app._data = {};
@@ -185,8 +185,10 @@ var carttirail = {};
 	var _data = function() {
 
 		if(config.data) {
+
 			display(data);
 			return false;
+			
 		}
 
 		if(config.dataSource) {
