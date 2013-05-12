@@ -291,8 +291,7 @@ var carttirail = {};
 
 		var map = app.map;
 
-		if(app.markers._layers.length)
-			app.markers.clearLayers();
+		app.markers.clearLayers();
 
 		_.each(items, function(item, i) {
 			var lat = item[config.dataRef.lat];
