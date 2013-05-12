@@ -227,7 +227,7 @@ var carttirail = {};
 					data = data[config.get];
 				}
 				// create ids if undefined
-				if(!config.dataRef.id) {
+				if(!config.dataRef && !config.dataRef.id) {
 					_.each(data, function(item, i) { data[i].id = i; });
 				}
 
