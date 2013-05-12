@@ -1,4 +1,4 @@
-Carttirail
+carttirail
 ==========
 
 A JavaScript app to visualize map data with filtering tools
