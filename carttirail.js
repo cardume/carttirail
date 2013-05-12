@@ -246,6 +246,7 @@ var carttirail = {};
 	}
 
 	var _map = function(data) {
+		console.log('hi');
 		if(!config.map)
 			return false;
 
