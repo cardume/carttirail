@@ -223,8 +223,6 @@ var carttirail = {};
 				$('body').removeClass('loading');
 				app.$.content = $('<div id="carttirail-content"><div class="inner"></div></div>');
 				app.$.append(app.$.content);
-				if(app.map)
-					app.map.invalidateSize(true); //reset map size
 
 				// get specific node from json if specified
 				if(config.get) {
