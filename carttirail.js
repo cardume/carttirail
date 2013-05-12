@@ -276,7 +276,7 @@ var carttirail = {};
 	}
 
 	var _markers = function(items) {
-		if(!config.map)
+		if(!config.map.markers)
 			return false;
 
 		var map = app.map;
