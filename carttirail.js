@@ -267,14 +267,14 @@ var carttirail = {};
 		}).addTo(map);
 
 		if(config.map.markers && config.map.markers.cluster)
-			map.markersGroup = new L.MarkerClusterGroup();
+			app.markers = new L.MarkerClusterGroup();
 		else
-			map.markersGroup = L.layerGroup();
+			app.markers = L.layerGroup();
 
-		map.addLayer(map.markersGroup);
+		map.addLayer(app.markers);
 	
 		// create and store marker icons
-		if(config.map.markers && config.map.markers.icons.length) {
+		if(config.map.markers && config.map.markers.icons) {
 			app._data.icons = [];
 			var LeafIcon = L.Icon.extend({});
 			_.each(config.map.markers.icons, function(icon, i) {
@@ -290,22 +290,25 @@ var carttirail = {};
 			return false;
 
 		var map = app.map;
-		map.markersGroup.clearLayers();
+
+		if(app.markers._layers.length)
+			app.markers.clearLayers();
+
 		_.each(items, function(item, i) {
 			var lat = item[config.dataRef.lat];
 			var lng = item[config.dataRef.lng];
-			if(lat && lng) {
+			if(lat && !isNaN(lat) && lng && !isNaN(lng)) {
 				var LatLng = new L.LatLng(parseFloat(lat), parseFloat(lng));
 				var options = {};
 				// marker icon
-				if(app._data.icons && app._data.icons.length) {
+				if(app._data.icons) {
 					var icons = app._data.icons;
 					if(config.map.markers.type == 'random') {
 						options.icon = icons[_.random(0, icons.length-1)];
 					}
 				}
 				// create
-				var marker = L.marker(LatLng, options);
+				var marker = new L.Marker(LatLng, options);
 				if(!config.templates.marker)
 					config.templates.marker = config.templates.list;
 				if(config.templates.marker) {
@@ -327,7 +330,7 @@ var carttirail = {};
 					app.openItem(item[idKey]);
 					return false;
 				});
-				map.markersGroup.addLayer(marker);
+				app.markers.addLayer(marker);
 			}
 		});	
 	}
@@ -348,7 +351,111 @@ var carttirail = {};
 		var filtering = app.filteringVals;
 		var data = app.data;
 
-		var _storeFilter = function(group, val, filter) {
+		_.each(filters, function(filter, i) {
+
+			$container.append('<div class="' + filter.name + ' filter"></div>');
+
+			if(filter.type == 'text') {
+				$container.find('.filter.' + filter.name).html('<input type="text" placeholder="' + filter.title + '" id="' + filter.name + '" />');
+
+				/* bind events */
+
+				$('input#' + filter.name).bind('keyup', function(e) {
+					filtering[filter.name] = $(this).val();
+					app.filter(filtering);
+					if(e.keyCode == 13)
+						return false;
+				});
+
+			} else if(filter.type == 'multiple-select' || filter.type == 'select') {
+
+				var multipleAttr = '';
+				if(filter.type == 'multiple-select')
+					multipleAttr = 'multiple';
+				var $select = $('<select id="' + filter.name + '" data-placeholder="' + filter.title + '" class="chzn-select" ' + multipleAttr + '><option></option></select>');
+
+				$container.find('.filter.' + filter.name).html($select);
+
+				app.$.find('select#' + filter.name).change(function() {
+					filtering[filter.name] = $(this).val();
+					app.filter(filtering);
+				});
+
+			}
+		});
+
+		// populate filter
+		_populateFilters(data);
+
+		$('.chzn-select').chosen({
+			allow_single_deselect: true
+		});
+
+		app.$.find('.clear-search').click(function() {
+			filtering = {};
+			_.each(config.filters, function(filter, i) {
+				var $field = app.$.filters.find('#' + filter.name);
+				$field.val('');
+				if(filter.type == 'multiple-select')
+					$field.val([]);
+				if(filter.type == 'multiple-select' || filter.type == 'select')
+					$field.trigger("liszt:updated");
+			});
+			app.filter();
+			return false;
+		});
+	}
+
+	var _populateFilters = function(data) {
+
+		_.each(config.filters, function(filter, i) {
+
+			if(filter.type == 'multiple-select' || filter.type == 'select') {
+
+				var $select = $('#' + filter.name);
+
+				$select.empty().append('<option />');
+
+				if(!app._data[filter.name])
+					app._data[filter.name] = [];
+
+				var filterVals = app._data[filter.name];
+
+				if(filter.values) {
+
+					_.each(filter.values, function(filterVal, i) {
+						filterVals = _storeFilter(filterVals, filterVal, filter);
+					});
+
+				} else {
+
+					_.each(data, function(item, i) {
+						var filterVal = item[filter.sourceRef];
+						if(filter.split) {
+							filterVal = filterVal.split(filter.split);
+						}
+						if(filterVal instanceof Array) {
+							_.each(filterVal, function(v, i) {
+								filterVals = _storeFilter(filterVals, v, filter);
+							});
+						} else {
+							filterVals = _storeFilter(filterVals, filterVal, filter);
+						}
+						filterVals = _.sortBy(filterVals, function(val) { return val[_.keys(val)[0]]; });
+
+					});
+
+				}
+
+				_.each(filterVals, function(val, i) { 
+					$select.append('<option value="' + _.keys(val)[0] + '">' + val[_.keys(val)[0]] + '</option><% }); %>');
+				});
+
+			}
+
+		});
+
+		function _storeFilter(group, val, filter) {
 
 			v = {};
 
@@ -400,79 +507,6 @@ var carttirail = {};
 
 		}
 
-		_.each(filters, function(filter, i) {
-
-			$container.append('<div class="' + filter.name + ' filter"></div>');
-
-			if(filter.type == 'text') {
-				$container.find('.filter.' + filter.name).html('<input type="text" placeholder="' + filter.title + '" id="' + filter.name + '" />');
-
-				/* bind events */
-
-				$('input#' + filter.name).bind('keyup', function(e) {
-					filtering[filter.name] = $(this).val();
-					app.filter(filtering);
-					if(e.keyCode == 13)
-						return false;
-				});
-
-			} else if(filter.type == 'multiple-select' || filter.type == 'select') {
-
-				// populate filter
-				var filterVals = app._data[filter.name] = [];
-				if(filter.values) {
-					_.each(filter.values, function(filterVal, i) {
-						filterVals = _storeFilter(filterVals, filterVal, filter);
-					});
-				} else {
-					_.each(data, function(item, i) {
-						var filterVal = item[filter.sourceRef];
-						if(filter.split) {
-							filterVal = filterVal.split(filter.split);
-						}
-						if(filterVal instanceof Array) {
-							_.each(filterVal, function(v, i) {
-								filterVals = _storeFilter(filterVals, v, filter);
-							});
-						} else {
-							filterVals = _storeFilter(filterVals, filterVal, filter);
-						}
-						filterVals = _.sortBy(filterVals, function(val) { return val[_.keys(val)[0]]; });
-					});
-				}
-				var multipleAttr = '';
-				if(filter.type == 'multiple-select')
-					multipleAttr = 'multiple';
-				var $select = $('<select id="' + filter.name + '" data-placeholder="' + filter.title + '" class="chzn-select" ' + multipleAttr + '><option></option></select>');
-				_.each(filterVals, function(val, i) { 
-					$select.append('<option value="' + _.keys(val)[0] + '">' + val[_.keys(val)[0]] + '</option><% }); %>');
-				});
-				$container.find('.filter.' + filter.name).html($select);
-
-				app.$.find('select#' + filter.name).change(function() {
-					filtering[filter.name] = $(this).val();
-					app.filter(filtering);
-				});
-			}
-		});
-
-		$('.chzn-select').chosen({
-			allow_single_deselect: true
-		});
-
-		app.$.find('.clear-search').click(function() {
-			filtering = {};
-			_.each(config.filters, function(filter, i) {
-				var $field = app.$.filters.find('#' + filter.name);
-				$field.val('');
-				if(filter.type == 'multiple-select')
-					$field.val([]);
-				if(filter.type == 'multiple-select' || filter.type == 'select')
-					$field.trigger("liszt:updated");
-			});
-			app.filter();
-			return false;
-		});
 	}
 
 	var _itemList = function(items) {
