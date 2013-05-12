@@ -42,12 +42,16 @@ var carttirail = {};
 		app.containerID = containerID;
 		config = _.extend(app.settings, parseConfig(userConf));
 		if($.isReady) {
-			_init(containerID);
+			initialize();
 		} else {
 			$(document).ready(function() {
-				_init(containerID);
+				initiliaze();
 			});
 		}
+
+		var initialize = _.once(function() {
+			_init(containerID);
+		});
 	};
 
 	app._data = {};
