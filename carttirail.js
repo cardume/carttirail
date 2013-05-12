@@ -41,7 +41,13 @@ var carttirail = {};
 	app.init = function(containerID, userConf) {
 		app.containerID = containerID;
 		config = _.extend(app.settings, parseConfig(userConf));
-		_init(containerID);
+		if($.isReady) {
+			_init(containerID);
+		} else {
+			$(document).ready(function() {
+				_init(containerID);
+			});
+		}
 	};
 
 	app._data = {};
@@ -154,33 +160,31 @@ var carttirail = {};
 	}
 
 	var _init = function() {
-		$(document).ready(function() {
 
-			app.$ = $('#' + app.containerID);
+		app.$ = $('#' + app.containerID);
 
-			if(config.labels.title) {
-				app.$.header = $('<div id="header" />');
-				app.$.header.append($('<h1>' + config.labels.title + '</h1>'));
-				if(config.labels.subtitle) {
-					app.$.header.append($('<h2>' + config.labels.subtitle + '</h2>'));
-				}
-				if(config.nav) {
-					app.$.nav = $('<div class="nav" />');
-					_.each(config.nav, function(item, i) {
-						app.$.nav.append('<a href="' + item.url + '" target="_blank" rel="external">' + item.title + '</a>');
-					});
-					app.$.header.append(app.$.nav);
-				}
-				app.$.append(app.$.header);
+		if(config.labels.title) {
+			app.$.header = $('<div id="header" />');
+			app.$.header.append($('<h1>' + config.labels.title + '</h1>'));
+			if(config.labels.subtitle) {
+				app.$.header.append($('<h2>' + config.labels.subtitle + '</h2>'));
 			}
+			if(config.nav) {
+				app.$.nav = $('<div class="nav" />');
+				_.each(config.nav, function(item, i) {
+					app.$.nav.append('<a href="' + item.url + '" target="_blank" rel="external">' + item.title + '</a>');
+				});
+				app.$.header.append(app.$.nav);
+			}
+			app.$.append(app.$.header);
+		}
 
-			app.$.loading = $('<div id="loading">' + config.labels.loading.first + '</div>');
-			app.$.append(app.$.loading);
+		app.$.loading = $('<div id="loading">' + config.labels.loading.first + '</div>');
+		app.$.append(app.$.loading);
 
-			_data();
-			_map();
+		_data();
+		_map();
 
-		});
 	}
 
 	var _data = function() {
