@@ -230,7 +230,7 @@ var carttirail = {};
 				}
 				// create ids if undefined
 				if(!config.dataRef.id) {
-					_.each(data, function(item, i) { data[i].id = i; });
+					_.each(data, function(item, i) { data[i].id = 'item-' + i; });
 				}
 
 				app.data = data; // store data
