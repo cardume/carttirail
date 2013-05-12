@@ -183,53 +183,61 @@ var carttirail = {};
 	}
 
 	var _data = function() {
-		if(!config.dataSource)
+
+		if(config.data) {
+			display(data);
 			return false;
-
-		$('body').addClass('loading');
-
-		var opts = {
-			url: config.dataSource,
-			dataType: 'jsonp',
-			timeout: 8000, // 8 second timeout
-			success: function(data) {
-				if(!data) {
-					$('#loading').text(config.labels.loading.error);
-				} else {
-					$('body').removeClass('loading');
-					app.$.content = $('<div id="carttirail-content"><div class="inner"></div></div>');
-					app.$.append(app.$.content);
-					if(app.map)
-						app.map.invalidateSize(true); //reset map size
-
-					// get specific node from json if specified
-					if(config.get) {
-						data = data[config.get];
-					}
-					// create ids if undefined
-					if(!config.dataRef.id) {
-						_.each(data, function(item, i) { data[i].id = i; });
-					}
-
-					app.data = data; // store data
-					_markers(data);
-					_filters();
-					_itemList(data);
-					appDimensions();
-					app.$.loading.hide();
-					_readFragments();
-				}
-			},
-			error: function() {
-				app.$.loading.text(config.labels.loading.error);
-			}
-		};
-
-		if(config.jsonpCallback && config.jsonpCallback !== '?') {
-			opts.jsonpCallback = config.jsonpCallback;
 		}
 
-		$.ajax(opts);
+		if(config.dataSource) {
+
+			$('body').addClass('loading');
+
+			var opts = {
+				url: config.dataSource,
+				dataType: 'jsonp',
+				timeout: 8000, // 8 second timeout
+				success: display,
+				error: function() {
+					app.$.loading.text(config.labels.loading.error);
+				}
+			};
+
+			if(config.jsonpCallback && config.jsonpCallback !== '?') {
+				opts.jsonpCallback = config.jsonpCallback;
+			}
+
+			$.ajax(opts);
+		}
+
+		function display(data) {
+			if(!data) {
+				$('#loading').text(config.labels.loading.error);
+			} else {
+				$('body').removeClass('loading');
+				app.$.content = $('<div id="carttirail-content"><div class="inner"></div></div>');
+				app.$.append(app.$.content);
+				if(app.map)
+					app.map.invalidateSize(true); //reset map size
+
+				// get specific node from json if specified
+				if(config.get) {
+					data = data[config.get];
+				}
+				// create ids if undefined
+				if(!config.dataRef.id) {
+					_.each(data, function(item, i) { data[i].id = i; });
+				}
+
+				app.data = data; // store data
+				_markers(data);
+				_filters();
+				_itemList(data);
+				appDimensions();
+				app.$.loading.hide();
+				_readFragments();
+			}
+		}
 
 	}
 
