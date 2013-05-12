@@ -247,7 +247,7 @@ var carttirail = {};
 
 	var _map = function(data) {
 
-		if(!config.map && app.map)
+		if(!config.map || app.map)
 			return false;
 
 		app.$.map = $('<div class="carttirail-map-container"><div id="carttirail-map"></div></div>');
