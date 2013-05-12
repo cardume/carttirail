@@ -238,6 +238,11 @@ h1,h2,h3,h4 {
 	margin-top: 5px;
 }
 
+#header h2 a {
+	color: #fff;
+	text-decoration: none;
+}
+
 #header .nav {
 	float: right;
 	margin: 38px 20px 0;
