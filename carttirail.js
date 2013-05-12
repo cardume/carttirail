@@ -5,6 +5,7 @@ var carttirail = {};
 	var app = carttirail;
 
 	app.settings = {
+		dataRef: {},
 		map: {
 			tiles: 'http://tile.stamen.com/toner/{z}/{x}/{y}.png',
 			center: [0, 0],
@@ -227,7 +228,7 @@ var carttirail = {};
 					data = data[config.get];
 				}
 				// create ids if undefined
-				if(!config.dataRef && !config.dataRef.id) {
+				if(!config.dataRef.id) {
 					_.each(data, function(item, i) { data[i].id = i; });
 				}
 
