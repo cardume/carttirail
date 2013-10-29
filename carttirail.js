@@ -6,6 +6,7 @@ var carttirail = {};
 
 	app.settings = {
 		dataRef: {},
+		dataType: 'jsonp',
 		map: {
 			tiles: 'http://tile.stamen.com/toner/{z}/{x}/{y}.png',
 			center: [0, 0],
@@ -67,8 +68,8 @@ var carttirail = {};
 			idKey = 'id';
 		var item = _.find(app.data, function(item) { return item[idKey] == id; });
 		if(item) {
-			var lat = item[config.dataRef.lat];
-			var lng = item[config.dataRef.lng];
+			var lat = eval('item.' + config.dataRef.lat);
+			var lng = eval('item.' + config.dataRef.lng);
 			var map = app.map;
 			if(lat && lng)
 				map.setView([lat, lng], config.map.maxZoom);
@@ -83,7 +84,7 @@ var carttirail = {};
 				var opts = {
 					url: itemSource.url,
 					data: parameters,
-					dataType: 'jsonp',
+					dataType: config.dataType,
 					timeout: 8000, // 8 second timeout
 					success: function(data) {
 						for(key in itemSource.get) {
@@ -113,7 +114,7 @@ var carttirail = {};
 	app.closeItem = function() {
 		fragment.rm('p');
 		$('#single-page').hide();
-		app.map.setView(config.map.center, config.map.zoom);
+		app.map.fitBounds(app.markers.getBounds());
 	}
 
 	app.filter = function(options) {
@@ -126,12 +127,12 @@ var carttirail = {};
 				if(filtering) {
 					var fragmentData = {};
 					if(typeof filtering === 'string') {
-						filteredData = _.filter(filteredData, function(item) { if(item[filter.sourceRef]) return item[filter.sourceRef].toLowerCase().indexOf(filtering.toLowerCase()) != -1; });
+						filteredData = _.filter(filteredData, function(item) { if(eval('item.' + filter.sourceRef)) return eval('item.' + filter.sourceRef).toLowerCase().indexOf(filtering.toLowerCase()) != -1; });
 						fragmentData[filter.name] = filtering;
 					} else if(filtering instanceof Array) {
 						var optionsFiltered = [];
 						_.each(filtering, function(option, i) {
-							optionsFiltered.push(_.filter(filteredData, function(item) { if(item[filter.sourceRef]) return item[filter.sourceRef].indexOf(option) != -1; }));
+							optionsFiltered.push(_.filter(filteredData, function(item) { if(eval('item.' + filter.sourceRef)) return eval('item.' + filter.sourceRef).indexOf(option) != -1; }));
 						});
 						filteredData = _.flatten(optionsFiltered);
 						fragmentData[filter.name] = filtering.join('|');
@@ -198,7 +199,7 @@ var carttirail = {};
 
 			var opts = {
 				url: config.dataSource,
-				dataType: 'jsonp',
+				dataType: 'json',
 				timeout: 8000, // 8 second timeout
 				success: display,
 				error: function() {
@@ -294,8 +295,8 @@ var carttirail = {};
 		app.markers.clearLayers();
 
 		_.each(items, function(item, i) {
-			var lat = item[config.dataRef.lat];
-			var lng = item[config.dataRef.lng];
+			var lat = eval('item.' + config.dataRef.lat);
+			var lng = eval('item.' + config.dataRef.lng);
 			if(lat && !isNaN(lat) && lng && !isNaN(lng)) {
 				var LatLng = new L.LatLng(parseFloat(lat), parseFloat(lng));
 				var options = {};
@@ -331,7 +332,10 @@ var carttirail = {};
 				});
 				app.markers.addLayer(marker);
 			}
-		});	
+		});
+
+		map.fitBounds(app.markers.getBounds());
+
 	}
 
 	var _filters = function() {
@@ -429,7 +433,7 @@ var carttirail = {};
 				} else {
 
 					_.each(data, function(item, i) {
-						var filterVal = item[filter.sourceRef];
+						var filterVal = eval('item.' + filter.sourceRef);
 						if(filter.split) {
 							filterVal = filterVal.split(filter.split);
 						}
