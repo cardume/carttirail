@@ -214,8 +214,8 @@ h1,h2,h3,h4 {
 #header {
 	position: absolute;
 	top: 0;
+	width: 100%;
 	height: 100px;
-	width: 70%;
 	background: #000;
 	z-index: 99999;
 }
@@ -288,7 +288,7 @@ h1,h2,h3,h4 {
 
 #carttirail-content {
 	position: fixed;
-	top: 0;
+	top: 100px;
 	bottom: 0;
 	right: 0;
 	width: 30%;

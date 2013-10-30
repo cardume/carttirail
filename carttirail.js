@@ -658,7 +658,7 @@ var carttirail = {};
 		});
 
 		var _updateHeight = function() {
-			var top = app.$.items.offset().top + 50;
+			var top = app.$.items.offset().top + -100 + 50;
 			$container.css({top: top});
 		}
 
@@ -743,8 +743,6 @@ var carttirail = {};
 					app.$.map.css({right: app.$.content.width()});
 					app.map.invalidateSize(true);
 				}
-				if(app.$.header)
-					app.$.header.css({right: app.$.content.width()});
 				if(app.$.page)
 					app.$.page.css({right: app.$.content.width()});
 			}
