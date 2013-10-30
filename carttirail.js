@@ -120,34 +120,67 @@ var carttirail = {};
 
 	app.filter = function(options) {
 
-		var filteredData = app.data;
+		var filteredData = _.extend(app.data, []);
 
 		_.each(config.filters, function(filter, i) {
+
+			var filtering = false;
+
 			if(options instanceof Object) {
-				var filtering = options[filter.name];
-				if(filtering) {
-					var fragmentData = {};
-					if(typeof filtering === 'string') {
-						filteredData = _.filter(filteredData, function(item) { if(eval('item.' + filter.sourceRef)) return eval('item.' + filter.sourceRef).toLowerCase().indexOf(filtering.toLowerCase()) != -1; });
-						fragmentData[filter.name] = filtering;
-					} else if(filtering instanceof Array) {
-						var optionsFiltered = [];
-						_.each(filtering, function(option, i) {
-							optionsFiltered.push(_.filter(filteredData, function(item) { if(eval('item.' + filter.sourceRef)) return eval('item.' + filter.sourceRef).indexOf(option) != -1; }));
-						});
-						filteredData = _.flatten(optionsFiltered);
-						fragmentData[filter.name] = filtering.join('|');
-					}
-					fragment.set(fragmentData);
-				} else {
-					fragment.rm(filter.name);
-					if(filter.disabledByDefault && filter.type == 'toggle') {
-						filteredData = _.filter(filteredData, function(item) { if(eval('item.' + filter.sourceRef)) return eval('item.' + filter.sourceRef).indexOf(filter.value) === -1; else return item; });
-					}
-				}
-			} else {
-				fragment.rm(filter.name);
+				filtering = options[filter.name];
 			}
+
+			var dataToFilter = filteredData;
+
+			if(filtering) {
+
+				var fragmentData = {};
+
+				if(typeof filtering === 'string') {
+
+					filteredData = _.filter(dataToFilter, function(item) {
+						if(eval('item.' + filter.sourceRef))
+							return eval('item.' + filter.sourceRef).toLowerCase().indexOf(filtering.toLowerCase()) != -1; }
+						);
+
+					fragmentData[filter.name] = filtering;
+
+				} else if(filtering instanceof Array) {
+
+					var optionsFiltered = [];
+
+					_.each(filtering, function(option, i) {
+
+						optionsFiltered.push(_.filter(dataToFilter, function(item) { if(eval('item.' + filter.sourceRef)) return eval('item.' + filter.sourceRef).indexOf(option) != -1; }));
+
+					});
+
+					filteredData = _.flatten(optionsFiltered);
+					fragmentData[filter.name] = filtering.join('|');
+
+				}
+
+				fragment.set(fragmentData);
+
+			} else {
+
+				fragment.rm(filter.name);
+
+			}
+
+			if(filter.disabledByDefault && filter.type == 'toggle' && !filtering) {
+
+				filteredData = _.filter(dataToFilter, function(item) {
+
+					if(eval('item.' + filter.sourceRef))
+						return eval('item.' + filter.sourceRef).indexOf(filter.value) === -1;
+					else
+						return item;
+
+				});
+
+			}
+
 		});
 
 		// prevent duplicates
@@ -403,7 +436,11 @@ var carttirail = {};
 
 			} else if(filter.type == 'checkbox') {
 
+				/* TO DO */
+				
+			} else if(filter.type == 'radio') {
 
+				/* TO DO */
 
 			} else if(filter.type == 'toggle') {
 
@@ -437,12 +474,13 @@ var carttirail = {};
 			filtering = {};
 			_.each(config.filters, function(filter, i) {
 				var $field = app.$.filters.find('#' + filter.name);
-				$field.val('');
+				if(!$field.is('[type=checkbox]') && !$field.is('[type=radio]'))
+					$field.val('');
 				if(filter.type == 'multiple-select')
 					$field.val([]);
 				if(filter.type == 'multiple-select' || filter.type == 'select')
 					$field.trigger("liszt:updated");
-				if(filter.type == 'true_false')
+				if(filter.type == 'toggle')
 					$field.attr('checked', false);
 			});
 			app.filter();
@@ -673,7 +711,11 @@ var carttirail = {};
 					if(val.indexOf('|') != -1)
 						val = val.split('|');
 					var $input = $('.filter #' + filter.name);
-					$input.val(val);
+					if($input.is('[type=checkbox]')) {
+						$input.attr('checked', true);
+					} else {
+						$input.val(val);
+					}
 					if($input.is('select'))
 						$input.trigger('liszt:updated');
 					filtering[filter.name] = val;
@@ -706,6 +748,9 @@ var carttirail = {};
 				if(app.$.page)
 					app.$.page.css({right: app.$.content.width()});
 			}
+			app.$.css({
+				height: '100%'
+			});
 		}).resize();
 	}
 
