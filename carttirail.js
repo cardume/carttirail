@@ -71,6 +71,7 @@ var carttirail = {};
 			var lat = eval('item.' + config.dataRef.lat);
 			var lng = eval('item.' + config.dataRef.lng);
 			var map = app.map;
+			map.previousLocation = map.getBounds();
 			if(lat && lng)
 				map.setView([lat, lng], config.map.maxZoom);
 			else
@@ -114,7 +115,7 @@ var carttirail = {};
 	app.closeItem = function() {
 		fragment.rm('p');
 		$('#single-page').hide();
-		app.map.fitBounds(app.markers.getBounds());
+		app.map.fitBounds(app.map.previousLocation);
 	}
 
 	app.filter = function(options) {
@@ -140,6 +141,9 @@ var carttirail = {};
 					fragment.set(fragmentData);
 				} else {
 					fragment.rm(filter.name);
+					if(filter.disabledByDefault && filter.type == 'toggle') {
+						filteredData = _.filter(filteredData, function(item) { if(eval('item.' + filter.sourceRef)) return eval('item.' + filter.sourceRef).indexOf(filter.value) === -1; else return item; });
+					}
 				}
 			} else {
 				fragment.rm(filter.name);
@@ -287,6 +291,8 @@ var carttirail = {};
 		}
 
 		_markers(data);
+		map.fitBounds(app.markers.getBounds());
+
 	}
 
 	var _markers = function(items) {
@@ -347,8 +353,6 @@ var carttirail = {};
 			}
 		});
 
-		map.fitBounds(app.markers.getBounds());
-
 	}
 
 	var _filters = function() {
@@ -369,9 +373,10 @@ var carttirail = {};
 
 		_.each(filters, function(filter, i) {
 
-			$container.append('<div class="' + filter.name + ' filter"></div>');
+			$container.append('<div class="' + filter.name + ' filter ' + filter.type + '"></div>');
 
 			if(filter.type == 'text') {
+
 				$container.find('.filter.' + filter.name).html('<input type="text" placeholder="' + filter.title + '" id="' + filter.name + '" />');
 
 				/* bind events */
@@ -385,9 +390,8 @@ var carttirail = {};
 
 			} else if(filter.type == 'multiple-select' || filter.type == 'select') {
 
-				var multipleAttr = '';
-				if(filter.type == 'multiple-select')
-					multipleAttr = 'multiple';
+				var multipleAttr = (filter.type == 'multiple-select') ? 'multiple' : '';
+
 				var $select = $('<select id="' + filter.name + '" data-placeholder="' + filter.title + '" class="chzn-select" ' + multipleAttr + '><option></option></select>');
 
 				$container.find('.filter.' + filter.name).html($select);
@@ -397,7 +401,29 @@ var carttirail = {};
 					app.filter(filtering);
 				});
 
+			} else if(filter.type == 'checkbox') {
+
+
+
+			} else if(filter.type == 'toggle') {
+
+				var value = (typeof filter.value !== 'undefined') ? filter.value : 1;
+
+				$container.find('.filter.' + filter.name).html('<input type="checkbox" id="' + filter.name + '" value="' + value + '" /> <label for="' + filter.name + '">' + filter.title + '</label>');
+
+				/* bind events */
+
+				$('input#' + filter.name).bind('change', function(e) {
+					if($(this).is(':checked')) {
+						filtering[filter.name] = $(this).val();
+					} else {
+						delete filtering[filter.name];
+					}
+					app.filter(filtering);
+				});
+
 			}
+
 		});
 
 		// populate filter
@@ -416,6 +442,8 @@ var carttirail = {};
 					$field.val([]);
 				if(filter.type == 'multiple-select' || filter.type == 'select')
 					$field.trigger("liszt:updated");
+				if(filter.type == 'true_false')
+					$field.attr('checked', false);
 			});
 			app.filter();
 			return false;
@@ -465,10 +493,11 @@ var carttirail = {};
 
 				if(filterVals.length) {
 					_.each(filterVals, function(val, i) { 
-						$select.append('<option value="' + _.keys(val)[0] + '">' + val[_.keys(val)[0]] + '</option><% }); %>');
+						$select.append('<option value="' + _.keys(val)[0] + '">' + val[_.keys(val)[0]] + '</option>');
 					});
 				} else {
-					$select.remove();
+					alert('hi');
+					$select.parents('.filter').remove();
 				}
 
 			}

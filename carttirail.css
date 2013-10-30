@@ -424,6 +424,16 @@ h1,h2,h3,h4 {
 	float: right;
 }
 
+#carttirail-content #filters .filter.toggle {
+	margin-bottom: 10px;
+}
+
+#carttirail-content #filters .filter.toggle input,
+#carttirail-content #filters .filter.toggle label {
+	width: auto;
+	display: inline;
+}
+
 #carttirail-content .list {
 	position: absolute;
 	overflow: auto;
