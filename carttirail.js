@@ -270,7 +270,7 @@ var carttirail = {};
 		if(config.map.markers && config.map.markers.cluster)
 			app.markers = new L.MarkerClusterGroup();
 		else
-			app.markers = L.layerGroup();
+			app.markers = L.featureGroup();
 
 		map.addLayer(app.markers);
 	
@@ -279,7 +279,10 @@ var carttirail = {};
 			app._data.icons = [];
 			var LeafIcon = L.Icon.extend({});
 			_.each(config.map.markers.icons, function(icon, i) {
-				app._data.icons.push(new LeafIcon(icon));
+				var ref = icon.ref;
+				var icon = new LeafIcon(icon);
+				icon.ref = ref;
+				app._data.icons.push(icon);
 			});
 		}
 
@@ -305,6 +308,16 @@ var carttirail = {};
 					var icons = app._data.icons;
 					if(config.map.markers.type == 'random') {
 						options.icon = icons[_.random(0, icons.length-1)];
+					} else {
+						var markerIcon = false;
+						_.each(icons, function(icon, i) {
+							var found = _.find(icon.ref, function(ref) { return eval('item.' + ref.key) == ref.value; });
+							if(found && !markerIcon) {
+								markerIcon = icon;
+							}
+						});
+						if(markerIcon && typeof markerIcon !== 'undefined')
+							options.icon = markerIcon;
 					}
 				}
 				// create
@@ -450,9 +463,13 @@ var carttirail = {};
 
 				}
 
-				_.each(filterVals, function(val, i) { 
-					$select.append('<option value="' + _.keys(val)[0] + '">' + val[_.keys(val)[0]] + '</option><% }); %>');
-				});
+				if(filterVals.length) {
+					_.each(filterVals, function(val, i) { 
+						$select.append('<option value="' + _.keys(val)[0] + '">' + val[_.keys(val)[0]] + '</option><% }); %>');
+					});
+				} else {
+					$select.remove();
+				}
 
 			}
 
@@ -500,6 +517,17 @@ var carttirail = {};
 				} else {
 					return group;
 				}
+			}
+
+			// labels
+			if(filter.labels) {
+
+				var label = _.find(filter.labels, function(label, key) { return key == val; });
+
+				if(label) {
+					v[val] = label;
+				}
+
 			}
 
 			if(!_.any(group, function(item) { return _.isEqual(item, v); })) {
